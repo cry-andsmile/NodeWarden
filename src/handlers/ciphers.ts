@@ -13,6 +13,7 @@ function formatAttachments(attachments: Attachment[]): any[] | null {
     size: String(a.size),
     sizeName: a.sizeName,
     key: a.key,
+    url: null,
     object: 'attachment',
   }));
 }
@@ -23,7 +24,7 @@ function cipherToResponse(cipher: Cipher, attachments: Attachment[] = []): Ciphe
     id: cipher.id,
     organizationId: null,
     folderId: cipher.folderId,
-    type: cipher.type,
+    type: Number(cipher.type) || 1,
     name: cipher.name,
     notes: cipher.notes,
     favorite: cipher.favorite,
@@ -31,6 +32,7 @@ function cipherToResponse(cipher: Cipher, attachments: Attachment[] = []): Ciphe
     card: cipher.card,
     identity: cipher.identity,
     secureNote: cipher.secureNote,
+    sshKey: cipher.sshKey,
     fields: cipher.fields,
     passwordHistory: cipher.passwordHistory,
     reprompt: cipher.reprompt,
@@ -38,16 +40,18 @@ function cipherToResponse(cipher: Cipher, attachments: Attachment[] = []): Ciphe
     creationDate: cipher.createdAt,
     revisionDate: cipher.updatedAt,
     deletedDate: cipher.deletedAt,
+    archivedDate: null,
     edit: true,
     viewPassword: true,
     permissions: {
       delete: true,
       restore: true,
-      edit: true,
     },
     object: 'cipher',
     collectionIds: [],
     attachments: formatAttachments(attachments),
+    key: cipher.key,
+    encryptedFor: null,
   };
 }
 
@@ -103,13 +107,14 @@ export async function handleCreateCipher(request: Request, env: Env, userId: str
   }
 
   // Handle nested cipher object (from some clients)
-  const cipherData = body.cipher || body;
+  // Android client sends PascalCase "Cipher" for organization ciphers
+  const cipherData = body.Cipher || body.cipher || body;
 
   const now = new Date().toISOString();
   const cipher: Cipher = {
     id: generateUUID(),
     userId: userId,
-    type: cipherData.type,
+    type: Number(cipherData.type) || 1,
     folderId: cipherData.folderId || null,
     name: cipherData.name,
     notes: cipherData.notes || null,
@@ -118,9 +123,11 @@ export async function handleCreateCipher(request: Request, env: Env, userId: str
     card: cipherData.card || null,
     identity: cipherData.identity || null,
     secureNote: cipherData.secureNote || null,
+    sshKey: cipherData.sshKey || null,
     fields: cipherData.fields || null,
     passwordHistory: cipherData.passwordHistory || null,
     reprompt: cipherData.reprompt || 0,
+    key: cipherData.key || null,
     createdAt: now,
     updatedAt: now,
     deletedAt: null,
@@ -149,11 +156,12 @@ export async function handleUpdateCipher(request: Request, env: Env, userId: str
   }
 
   // Handle nested cipher object
-  const cipherData = body.cipher || body;
+  // Android client sends PascalCase "Cipher" for organization ciphers
+  const cipherData = body.Cipher || body.cipher || body;
 
   const cipher: Cipher = {
     ...existingCipher,
-    type: cipherData.type ?? existingCipher.type,
+    type: Number(cipherData.type) || existingCipher.type,
     folderId: cipherData.folderId !== undefined ? cipherData.folderId : existingCipher.folderId,
     name: cipherData.name ?? existingCipher.name,
     notes: cipherData.notes !== undefined ? cipherData.notes : existingCipher.notes,
@@ -162,9 +170,11 @@ export async function handleUpdateCipher(request: Request, env: Env, userId: str
     card: cipherData.card !== undefined ? cipherData.card : existingCipher.card,
     identity: cipherData.identity !== undefined ? cipherData.identity : existingCipher.identity,
     secureNote: cipherData.secureNote !== undefined ? cipherData.secureNote : existingCipher.secureNote,
+    sshKey: cipherData.sshKey !== undefined ? cipherData.sshKey : existingCipher.sshKey,
     fields: cipherData.fields !== undefined ? cipherData.fields : existingCipher.fields,
     passwordHistory: cipherData.passwordHistory !== undefined ? cipherData.passwordHistory : existingCipher.passwordHistory,
     reprompt: cipherData.reprompt ?? existingCipher.reprompt,
+    key: cipherData.key !== undefined ? cipherData.key : existingCipher.key,
     updatedAt: new Date().toISOString(),
   };
 

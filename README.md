@@ -27,9 +27,9 @@ A **Bitwarden-compatible** server that runs on **Cloudflare Workers**, designed 
 
 ## Tested clients / platforms
 
-- ✅ Windows desktop client
-- ✅ Mobile app (Android / iOS)
-- ✅ Browser extension
+- ✅ Windows desktop client（v2026.1.0）
+- ✅ Android app （v2026.1.0）
+- ✅ Browser extension（v2026.1.0）
 - ⬜ macOS desktop client (not tested)
 - ⬜ Linux desktop client (not tested)
 

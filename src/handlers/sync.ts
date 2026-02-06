@@ -11,6 +11,7 @@ function formatAttachments(attachments: Attachment[]): any[] | null {
     size: String(a.size),
     sizeName: a.sizeName,
     key: a.key,
+    url: null,
     object: 'attachment',
   }));
 }
@@ -41,6 +42,7 @@ export async function handleSync(request: Request, env: Env, userId: string): Pr
     twoFactorEnabled: false,
     key: user.key,
     privateKey: user.privateKey,
+    accountKeys: null,
     securityStamp: user.securityStamp || user.id,
     organizations: [],
     providers: [],
@@ -59,7 +61,7 @@ export async function handleSync(request: Request, env: Env, userId: string): Pr
       id: cipher.id,
       organizationId: null,
       folderId: cipher.folderId,
-      type: cipher.type,
+      type: Number(cipher.type) || 1,
       name: cipher.name,
       notes: cipher.notes,
       favorite: cipher.favorite,
@@ -67,6 +69,7 @@ export async function handleSync(request: Request, env: Env, userId: string): Pr
       card: cipher.card,
       identity: cipher.identity,
       secureNote: cipher.secureNote,
+      sshKey: cipher.sshKey,
       fields: cipher.fields,
       passwordHistory: cipher.passwordHistory,
       reprompt: cipher.reprompt,
@@ -74,16 +77,18 @@ export async function handleSync(request: Request, env: Env, userId: string): Pr
       creationDate: cipher.createdAt,
       revisionDate: cipher.updatedAt,
       deletedDate: cipher.deletedAt,
+      archivedDate: null,
       edit: true,
       viewPassword: true,
       permissions: {
         delete: true,
         restore: true,
-        edit: true,
       },
       object: 'cipher',
       collectionIds: [],
       attachments: formatAttachments(attachments),
+      key: cipher.key,
+      encryptedFor: null,
     });
   };
 
@@ -107,6 +112,18 @@ export async function handleSync(request: Request, env: Env, userId: string): Pr
     },
     policies: [],
     sends: [],
+    userDecryption: {
+      masterPasswordUnlock: {
+        salt: user.email,
+        kdf: {
+          kdfType: user.kdfType,
+          iterations: user.kdfIterations,
+          memory: user.kdfMemory || null,
+          parallelism: user.kdfParallelism || null,
+        },
+        masterKeyEncryptedUserKey: user.key,
+      },
+    },
     object: 'sync',
   };
 

@@ -3,11 +3,11 @@ import { Env } from '../types';
 // Rate limit configuration
 const CONFIG = {
   // Login attempt limits
-  LOGIN_MAX_ATTEMPTS: 5,           // Max failed login attempts
-  LOGIN_LOCKOUT_MINUTES: 15,       // Lockout duration after max attempts
+  LOGIN_MAX_ATTEMPTS: 15,          // Max failed login attempts
+  LOGIN_LOCKOUT_MINUTES: 5,        // Lockout duration after max attempts
   
   // API rate limits (per minute)
-  API_REQUESTS_PER_MINUTE: 60,     // General API rate limit
+  API_REQUESTS_PER_MINUTE: 300,    // General API rate limit
   API_WINDOW_SECONDS: 60,          // Rate limit window
 };
 

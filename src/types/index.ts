@@ -54,6 +54,8 @@ export interface CipherLogin {
   totp: string | null;
   autofillOnPageLoad: boolean | null;
   fido2Credentials: any[] | null;
+  uri: string | null;
+  passwordRevisionDate: string | null;
 }
 
 export interface CipherCard {
@@ -63,6 +65,12 @@ export interface CipherCard {
   expMonth: string | null;
   expYear: string | null;
   code: string | null;
+}
+
+export interface CipherSshKey {
+  publicKey: string;
+  privateKey: string;
+  keyFingerprint: string;
 }
 
 export interface CipherIdentity {
@@ -114,9 +122,11 @@ export interface Cipher {
   card: CipherCard | null;
   identity: CipherIdentity | null;
   secureNote: CipherSecureNote | null;
+  sshKey: CipherSshKey | null;
   fields: CipherField[] | null;
   passwordHistory: PasswordHistory[] | null;
   reprompt: number;
+  key: string | null;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -190,20 +200,21 @@ export interface ProfileResponse {
   email: string;
   emailVerified: boolean;
   premium: boolean;
-  premiumFromOrganization: boolean;  // required by mobile client
-  usesKeyConnector: boolean;  // required by mobile client
+  premiumFromOrganization: boolean;
+  usesKeyConnector: boolean;
   masterPasswordHint: string | null;
   culture: string;
   twoFactorEnabled: boolean;
   key: string;
   privateKey: string | null;
+  accountKeys: any | null;
   securityStamp: string;
   organizations: any[];
   providers: any[];
   providerOrganizations: any[];
   forcePasswordReset: boolean;
   avatarColor: string | null;
-  creationDate: string;  // required by mobile client
+  creationDate: string;
   object: string;
 }
 
@@ -219,6 +230,7 @@ export interface CipherResponse {
   card: CipherCard | null;
   identity: CipherIdentity | null;
   secureNote: CipherSecureNote | null;
+  sshKey: CipherSshKey | null;
   fields: CipherField[] | null;
   passwordHistory: PasswordHistory[] | null;
   reprompt: number;
@@ -226,18 +238,20 @@ export interface CipherResponse {
   creationDate: string;
   revisionDate: string;
   deletedDate: string | null;
+  archivedDate: string | null;
   edit: boolean;
   viewPassword: boolean;
   permissions: CipherPermissions | null;
   object: string;
   collectionIds: string[];
   attachments: any[] | null;
+  key: string | null;
+  encryptedFor: string | null;
 }
 
 export interface CipherPermissions {
   delete: boolean;
   restore: boolean;
-  edit: boolean;
 }
 
 export interface FolderResponse {
@@ -255,5 +269,6 @@ export interface SyncResponse {
   domains: any;
   policies: any[];
   sends: any[];
+  userDecryption: any | null;
   object: string;
 }

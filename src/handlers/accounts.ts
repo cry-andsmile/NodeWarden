@@ -97,6 +97,7 @@ export async function handleGetProfile(request: Request, env: Env, userId: strin
     twoFactorEnabled: false,
     key: user.key,
     privateKey: user.privateKey,
+    accountKeys: null,
     securityStamp: user.securityStamp || user.id,
     organizations: [],
     providers: [],

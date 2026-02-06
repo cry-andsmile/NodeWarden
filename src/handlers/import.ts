@@ -134,6 +134,8 @@ export async function handleCiphersImport(request: Request, env: Env, userId: st
         totp: c.login.totp || null,
         autofillOnPageLoad: null,
         fido2Credentials: null,
+        uri: null,
+        passwordRevisionDate: null,
       } : null,
       card: c.card ? {
         cardholderName: c.card.cardholderName || null,
@@ -172,6 +174,8 @@ export async function handleCiphersImport(request: Request, env: Env, userId: st
       })) || null,
       passwordHistory: c.passwordHistory || null,
       reprompt: c.reprompt || 0,
+      sshKey: null,
+      key: null,
       createdAt: now,
       updatedAt: now,
       deletedAt: null,

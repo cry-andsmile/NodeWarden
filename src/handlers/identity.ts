@@ -31,20 +31,19 @@ export async function handleToken(request: Request, env: Env): Promise<Response>
       return errorResponse('Email and password are required', 400);
     }
 
-    // Check if login is rate limited
-    const loginCheck = await rateLimit.checkLoginAttempt(email);
-    if (!loginCheck.allowed) {
-      return errorResponse(
-        `Too many failed login attempts. Try again in ${Math.ceil(loginCheck.retryAfterSeconds! / 60)} minutes.`,
-        429
-      );
-    }
-
     const user = await storage.getUser(email);
     if (!user) {
-      // Record failed attempt even for non-existent user (prevent enumeration)
-      await rateLimit.recordFailedLogin(email);
       return identityErrorResponse('Username or password is incorrect. Try again', 'invalid_grant', 400);
+    }
+
+    // Check if login is rate limited (only after confirming user exists)
+    const loginCheck = await rateLimit.checkLoginAttempt(email);
+    if (!loginCheck.allowed) {
+      return identityErrorResponse(
+        `Too many failed login attempts. Try again in ${Math.ceil(loginCheck.retryAfterSeconds! / 60)} minutes.`,
+        'TooManyRequests',
+        429
+      );
     }
 
     const valid = await auth.verifyPassword(passwordHash, user.masterPasswordHash);
@@ -136,6 +135,16 @@ export async function handleToken(request: Request, env: Env): Promise<Response>
       UserDecryptionOptions: {
         HasMasterPassword: true,
         Object: 'userDecryptionOptions',
+        MasterPasswordUnlock: {
+          Kdf: {
+            KdfType: user.kdfType,
+            Iterations: user.kdfIterations,
+            Memory: user.kdfMemory || null,
+            Parallelism: user.kdfParallelism || null,
+          },
+          MasterKeyEncryptedUserKey: user.key,
+          Salt: user.email.toLowerCase(),
+        },
       },
     };
 

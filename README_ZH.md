@@ -27,9 +27,9 @@ English：[`README.md`](./README.md)
 - ✅ 兼容常见的 Bitwarden 官方客户端
 
 ## 测试情况：
-- ✅ Windows 客户端
-- ✅ 手机 App（Android / iOS）
-- ✅ 浏览器扩展
+- ✅ Windows 客户端（v2026.1.0）
+- ✅ Android App（v2026.1.0）
+- ✅ 浏览器扩展（v2026.1.0）
 - ⬜ macOS 客户端（未测试）
 - ⬜ Linux 客户端（未测试）
 ---
