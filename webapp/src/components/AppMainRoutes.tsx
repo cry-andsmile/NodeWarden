@@ -33,6 +33,7 @@ export interface AppMainRoutesProps {
   profile: Profile | null;
   session: SessionState | null;
   mobileLayout: boolean;
+  mobileSidebarToggleKey: number;
   importRoute: string;
   settingsHomeRoute: string;
   settingsAccountRoute: string;
@@ -45,6 +46,8 @@ export interface AppMainRoutesProps {
   users: AdminUser[];
   invites: AdminInvite[];
   totpEnabled: boolean;
+  lockTimeoutMinutes: 0 | 1 | 5 | 15 | 30;
+  sessionTimeoutAction: 'lock' | 'logout';
   authorizedDevices: AuthorizedDevice[];
   authorizedDevicesLoading: boolean;
   onNavigate: (path: string) => void;
@@ -94,11 +97,12 @@ export interface AppMainRoutesProps {
   onEnableTotp: (secret: string, token: string) => Promise<void>;
   onOpenDisableTotp: () => void;
   onGetRecoveryCode: (masterPassword: string) => Promise<string>;
-  passkeys: Array<{ id: string; name: string; creationDate: string; lastUsedDate: string | null }>;
-  onCreatePasskey: (name: string) => Promise<void>;
-  onRenamePasskey: (id: string, name: string) => Promise<void>;
-  onDeletePasskey: (id: string) => Promise<void>;
+  onGetApiKey: (masterPassword: string) => Promise<string>;
+  onRotateApiKey: (masterPassword: string) => Promise<string>;
+  onLockTimeoutChange: (minutes: 0 | 1 | 5 | 15 | 30) => void;
+  onSessionTimeoutActionChange: (action: 'lock' | 'logout') => void;
   onRefreshAuthorizedDevices: () => Promise<void>;
+  onRenameAuthorizedDevice: (device: AuthorizedDevice, name: string) => Promise<void>;
   onRevokeDeviceTrust: (device: AuthorizedDevice) => void;
   onRemoveDevice: (device: AuthorizedDevice) => void;
   onRevokeAllDeviceTrust: () => void;
@@ -166,6 +170,7 @@ export default function AppMainRoutes(props: AppMainRoutesProps) {
             onBulkDelete={props.onBulkDeleteSends}
             uploadingSendFileName={props.uploadingSendFileName}
             sendUploadPercent={props.sendUploadPercent}
+            mobileSidebarToggleKey={props.mobileSidebarToggleKey}
             onNotify={props.onNotify}
           />
         </Suspense>
@@ -205,6 +210,7 @@ export default function AppMainRoutes(props: AppMainRoutesProps) {
             attachmentDownloadPercent={props.attachmentDownloadPercent}
             uploadingAttachmentName={props.uploadingAttachmentName}
             attachmentUploadPercent={props.attachmentUploadPercent}
+            mobileSidebarToggleKey={props.mobileSidebarToggleKey}
           />
         </Suspense>
       </Route>
@@ -223,16 +229,18 @@ export default function AppMainRoutes(props: AppMainRoutesProps) {
               <SettingsPage
                 profile={props.profile}
                 totpEnabled={props.totpEnabled}
+                lockTimeoutMinutes={props.lockTimeoutMinutes}
+                sessionTimeoutAction={props.sessionTimeoutAction}
                 onChangePassword={props.onChangePassword}
                 onSavePasswordHint={props.onSavePasswordHint}
                 onEnableTotp={props.onEnableTotp}
                 onOpenDisableTotp={props.onOpenDisableTotp}
                 onGetRecoveryCode={props.onGetRecoveryCode}
+                onGetApiKey={props.onGetApiKey}
+                onRotateApiKey={props.onRotateApiKey}
+                onLockTimeoutChange={props.onLockTimeoutChange}
+                onSessionTimeoutActionChange={props.onSessionTimeoutActionChange}
                 onNotify={props.onNotify}
-                passkeys={props.passkeys}
-                onCreatePasskey={props.onCreatePasskey}
-                onRenamePasskey={props.onRenamePasskey}
-                onDeletePasskey={props.onDeletePasskey}
               />
             </Suspense>
           </div>
@@ -289,6 +297,7 @@ export default function AppMainRoutes(props: AppMainRoutesProps) {
               devices={props.authorizedDevices}
               loading={props.authorizedDevicesLoading}
               onRefresh={() => void props.onRefreshAuthorizedDevices()}
+              onRenameDevice={props.onRenameAuthorizedDevice}
               onRevokeTrust={props.onRevokeDeviceTrust}
               onRemoveDevice={props.onRemoveDevice}
               onRevokeAll={props.onRevokeAllDeviceTrust}
