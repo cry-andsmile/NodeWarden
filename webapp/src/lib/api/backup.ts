@@ -96,6 +96,8 @@ export interface AdminBackupImportCounts {
   users: number;
   domainSettings?: number;
   userRevisions: number;
+  trustedTwoFactorDeviceTokens?: number;
+  webauthnCredentials?: number;
   folders: number;
   ciphers: number;
   attachments: number;
